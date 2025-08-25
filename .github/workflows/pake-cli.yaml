@@ -141,12 +141,20 @@ jobs:
             node_modules/pake-cli/src-tauri/target/
           key: ${{ inputs.platform }}-cargo-${{ hashFiles('node_modules/pake-cli/src-tauri/Cargo.lock') }}
 
-      - name: Build with pake-cli
+      - name: Build with pake-cli  
         timeout-minutes: 15
         run: |
-          node ./script/github-action-build.js
+          npx pake $URL \
+            --name $NAME \
+            ${{ inputs.icon && format('--icon {0}', inputs.icon) || '' }} \
+            --width $WIDTH \
+            --height $HEIGHT \
+            ${{ inputs.hide_title_bar && '--hide-title-bar' || '' }} \
+            ${{ inputs.fullscreen && '--fullscreen' || '' }} \  
+            ${{ inputs.platform == 'macos-latest' && inputs.multi_arch && '--multi-arch' || '' }} \  
+            ${{ inputs.platform == 'ubuntu-24.04' && format('--targets {0}', inputs.targets) || '' }}  
         env:
-          URL: ${{ inputs.url }}
+          URL: ${{ inputs.url }}  
           NAME: ${{ inputs.name }}
           ICON: ${{ inputs.icon }}
           HEIGHT: ${{ inputs.height }}
@@ -155,7 +163,7 @@ jobs:
           FULLSCREEN: ${{ inputs.fullscreen }}
           MULTI_ARCH: ${{ inputs.multi_arch }}
           TARGETS: ${{ inputs.targets }}
-          PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig
+          PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig    
           PKG_CONFIG_ALLOW_SYSTEM_LIBS: 1
           PKG_CONFIG_ALLOW_SYSTEM_CFLAGS: 1
 
